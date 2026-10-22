@@ -1,97 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<title>MDM4U</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
-body {font-family: "Roboto", sans-serif}
-.w3-bar-block .w3-bar-item {
-  padding: 16px;
-  font-weight: bold;
-}
-</style>
-<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travail 1.4 – MDM4U</title>
+
+  <!-- Feuilles de style du gabarit -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+    :root { --teal: #009688; --teal-fonce: #00796b; --rose: #e91e63; --gris: #5f6b76; --fond: #f4f7f7; }
+
+    body { font-family: "Roboto", sans-serif; background: var(--fond); line-height: 1.6; }
+    .w3-bar-block .w3-bar-item { padding: 16px; font-weight: bold; }
+    #mySidebar a.actif { background: #e0f2f1 !important; border-left: 5px solid var(--teal); }
+
+    .contenu { padding: 32px; max-width: 1000px; }
+    .carte { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.08); padding: 24px; margin-bottom: 24px; }
+    .carte h2 { margin-top: 0; color: var(--teal-fonce); }
+    .gris { color: var(--gris); }
+
+    .bouton { display: inline-block; padding: 10px 18px; border-radius: 999px; background: var(--rose); color: #fff !important; text-decoration: none; font-weight: 500; }
+    .bouton:hover { opacity: .9; }
+
+    /* Vidéo qui s'adapte à la largeur de l'écran */
+    .video { position: relative; width: 100%; max-width: 800px; aspect-ratio: 16 / 9; }
+    .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 8px; }
+
+    @media (max-width: 600px) { .contenu { padding: 16px; } }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
+
 <body>
-<!--Navigation bar-->
-<div id="nav-placeholder">
 
-</div>
+  <!-- Barre de navigation (chargée depuis nav.html) -->
+  <div id="nav-placeholder"></div>
+  <script>
+    $(function () {
+      $("#nav-placeholder").load("nav.html", function () {
+        $('#mySidebar a[href="module1-4.html"]').addClass("actif");
+      });
+    });
+  </script>
 
-<script>
-$(function(){
-  $("#nav-placeholder").load("nav.html");
-});
-</script>
-<!--end of Navigation bar-->
+  <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
 
-<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
+  <div class="w3-main" style="margin-left:250px;">
 
-<div class="w3-main" style="margin-left:250px;">
+    <div id="myTop" class="w3-container w3-top w3-theme w3-large">
+      <p><i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()"></i>
+      <span id="myIntro" class="w3-hide">MDM4U – Travail 1.4</span></p>
+    </div>
 
-<div id="myTop" class="w3-container w3-top w3-theme w3-large">
-  <p><i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()"></i>
-  <span id="myIntro" class="w3-hide">MDM4U</span></p>
-</div>
+    <header class="w3-container w3-theme" style="padding:64px 32px">
+      <h1 class="w3-xxxlarge">1.4 – Révision statistique</h1>
+    </header>
 
-<header class="w3-container w3-theme" style="padding:64px 32px">
-  <h1 class="w3-xxxlarge">Travail du 2.4 </h1>
-</header>
+    <main class="contenu">
 
-<div class="w3-container" style="padding:32px">
+      <!-- Devoir -->
+      <section class="carte">
+        <h2><i class="fa fa-file-text-o"></i> Révision statistique</h2>
+        <p class="gris">Mon travail de révision est dans un document Google.</p>
+        <a class="bouton" href="https://docs.google.com/document/d/1nEn9IVxn2xiB-pFQ-qAaKxvsFb8Op46ziiAOdV_jKCk/edit?tab=t.0" target="_blank" rel="noopener">
+          Ouvrir mon devoir <i class="fa fa-external-link"></i>
+        </a>
+      </section>
 
+      <!-- Vidéo -->
+      <section class="carte">
+        <h2><i class="fa fa-youtube-play"></i> Vidéo</h2>
+        <div class="video">
+          <iframe src="https://www.youtube.com/embed/Ui8o6fJjkck" title="Vidéo de révision"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </section>
 
+    </main>
 
-<img src="IMG_2906 2.jpg" alt="Photo de devoir 1" width="400">
+    <footer class="w3-container w3-theme" style="padding:32px">
+      <p>Contenu de cette page web par Jimi</p>
+    </footer>
 
-<img src="IMG_2907 2.jpg" alt="Photo de devoir 2" width="400">
+  </div>
 
-<img src="IMG_2909.jpg" alt="Photo de devoir 3" width="400">
+  <script>
+    // Menu sur téléphone
+    function w3_open() {
+      document.getElementById("mySidebar").style.display = "block";
+      document.getElementById("myOverlay").style.display = "block";
+    }
+    function w3_close() {
+      document.getElementById("mySidebar").style.display = "none";
+      document.getElementById("myOverlay").style.display = "none";
+    }
 
+    // Barre du haut quand on défile
+    window.onscroll = function () {
+      var bas = document.documentElement.scrollTop > 80;
+      document.getElementById("myTop").classList.toggle("w3-card-4", bas);
+      document.getElementById("myIntro").classList.toggle("w3-show-inline-block", bas);
+    };
+  </script>
 
-
-  
-
-<a href="https://docs.google.com/document/d/1ME1hv4-PGO5Io0OfhZ-kkcQjcR-CLbW-uWpNwZoiV3Y/edit?tab=t.0">Devoir 2.4B </a>
-
-
-</div>
-
-<footer class="w3-container w3-theme" style="padding:32px">
-  <p>Contenu de cette page web par M. Gore (prénom: Pytha)</p>
-</footer>
-     
-</div>
-
-<script>
-// Open and close the sidebar on medium and small screens
-function w3_open() {
-  document.getElementById("mySidebar").style.display = "block";
-  document.getElementById("myOverlay").style.display = "block";
-}
-
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
-  document.getElementById("myOverlay").style.display = "none";
-}
-
-// Change style of top container on scroll
-window.onscroll = function() {myFunction()};
-function myFunction() {
-  if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-    document.getElementById("myTop").classList.add("w3-card-4", "w3-animate-opacity");
-    document.getElementById("myIntro").classList.add("w3-show-inline-block");
-  } else {
-    document.getElementById("myIntro").classList.remove("w3-show-inline-block");
-    document.getElementById("myTop").classList.remove("w3-card-4", "w3-animate-opacity");
-  }
-}
-
-</script>
-     
 </body>
-</html> 
+</html>
