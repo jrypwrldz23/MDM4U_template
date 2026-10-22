@@ -1,90 +1,448 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<title>MDM4U</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
-body {font-family: "Roboto", sans-serif}
-.w3-bar-block .w3-bar-item {
-  padding: 16px;
-  font-weight: bold;
-}
-</style>
-<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travail 2.2 – MDM4U</title>
+
+  <!-- Feuilles de style du gabarit -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+    /* ===== Couleurs ===== */
+    :root {
+      --teal: #009688;
+      --teal-fonce: #00796b;
+      --rose: #e91e63;
+      --orange: #f4a100;
+      --texte: #1f2933;
+      --gris: #5f6b76;
+      --fond: #f4f7f7;
+      --ombre: 0 2px 10px rgba(0, 0, 0, .08);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: "Roboto", sans-serif; background: var(--fond); color: var(--texte); line-height: 1.6; }
+    .w3-bar-block .w3-bar-item { padding: 16px; font-weight: bold; }
+
+    /* Page active dans le menu */
+    #mySidebar a.actif { background: #e0f2f1 !important; border-left: 5px solid var(--teal); color: var(--teal-fonce); }
+
+    /* Barre de progression de lecture */
+    #progression { position: fixed; top: 0; left: 0; height: 4px; width: 0; background: var(--rose); z-index: 10; }
+
+    /* En-tête */
+    .entete { padding: 64px 32px 48px !important; }
+    .entete .petit-titre { text-transform: uppercase; letter-spacing: .12em; font-size: .85rem; opacity: .85; margin: 0; }
+    .entete h1 { margin: 4px 0 8px; }
+    .entete .intro { max-width: 700px; font-size: 1.1rem; margin: 0; }
+
+    /* Contenu */
+    .contenu { padding: 32px; max-width: 1100px; }
+    .carte { background: #fff; border-radius: 12px; box-shadow: var(--ombre); padding: 24px; margin-bottom: 24px; }
+    .carte h2 { margin-top: 0; color: var(--teal-fonce); }
+    .gris { color: var(--gris); }
+
+    /* Boutons */
+    .boutons { display: flex; gap: 12px; flex-wrap: wrap; }
+    .bouton { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; border: 2px solid var(--rose); background: var(--rose); color: #fff !important; text-decoration: none; font: inherit; font-weight: 500; cursor: pointer; transition: transform .15s; }
+    .bouton:hover { transform: translateY(-2px); }
+    .bouton.contour { background: transparent; border-color: var(--teal); color: var(--teal-fonce) !important; }
+
+    /* Aperçu du document Google */
+    .apercu { display: none; margin-top: 20px; }
+    .apercu.ouvert { display: block; animation: glisse .4s ease; }
+    .apercu iframe { width: 100%; height: 75vh; border: 1px solid #e3e8e8; border-radius: 8px; background: #fff; }
+    @keyframes glisse { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+    /* ===== Outil moyenne / médiane / mode ===== */
+    .puces { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 16px; }
+    .puce { border: 2px solid var(--teal); background: #fff; color: var(--teal-fonce); border-radius: 999px; padding: 6px 14px; font: inherit; font-weight: 500; cursor: pointer; }
+    .puce:hover, .puce.active { background: var(--teal); color: #fff; }
+    .puce.rose { border-color: var(--rose); color: var(--rose); }
+    .puce.rose:hover { background: var(--rose); color: #fff; }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat { background: #f0f4f4; border-radius: 10px; padding: 10px 14px; border-top: 4px solid #cfd8d8; }
+    .stat b { display: block; font-size: 1.5rem; transition: color .3s; }
+    .stat.moyenne { border-top-color: var(--rose); }
+    .stat.mediane { border-top-color: var(--teal); }
+    .stat.mode { border-top-color: var(--orange); }
+    .stat b.change { animation: pulse .5s ease; }
+    @keyframes pulse { 50% { transform: scale(1.12); } }
+
+    #diagPoints { width: 100%; height: auto; display: block; background: #fff; border: 1px solid #e3e8e8; border-radius: 8px; }
+    #diagPoints .repere { transition: transform .5s ease; }
+    .legende-diag { display: flex; gap: 18px; flex-wrap: wrap; font-size: .95rem; color: var(--gris); }
+    .pastille { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
+
+    .valeur { display: inline-block; padding: 1px 8px; margin: 2px; border-radius: 6px; background: #eef2f2; }
+    .valeur.milieu { background: var(--teal); color: #fff; font-weight: 700; }
+    .explication { background: #fff8e1; border-left: 5px solid var(--orange); border-radius: 8px; padding: 12px 16px; }
+    .erreur { color: var(--rose); font-weight: 500; }
+
+    details { border-bottom: 1px solid #e3e8e8; padding: 10px 0; }
+    details summary { cursor: pointer; font-weight: 500; color: var(--teal-fonce); }
+    details p { margin: 8px 0 0; }
+
+    /* Boutons page précédente / suivante */
+    .nav-pages { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+
+    /* Bouton retour en haut */
+    #retourHaut { position: fixed; right: 20px; bottom: 20px; width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--teal); color: #fff; font-size: 20px; box-shadow: var(--ombre); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    #retourHaut.visible { opacity: 1; pointer-events: auto; }
+
+    /* Apparition au défilement */
+    .apparait { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
+    .apparait.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .apparait { opacity: 1; transform: none; transition: none; }
+      .apercu.ouvert, .stat b.change { animation: none; }
+      #diagPoints .repere { transition: none; }
+    }
+
+    /* Téléphone */
+    @media (max-width: 600px) {
+      .contenu { padding: 16px; }
+      .entete { padding: 56px 16px 32px !important; }
+      .carte { padding: 18px; }
+      .apercu iframe { height: 65vh; }
+    }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
+
 <body>
-<!--Navigation bar-->
-<div id="nav-placeholder">
 
-</div>
+  <div id="progression"></div>
 
-<script>
-$(function(){
-  $("#nav-placeholder").load("nav.html");
-});
-</script>
-<!--end of Navigation bar-->
+  <!-- ===== Barre de navigation (chargée depuis nav.html) ===== -->
+  <div id="nav-placeholder"></div>
+  <script>
+    $(function () {
+      $("#nav-placeholder").load("nav.html", function () {
+        // Met en évidence la page actuelle dans le menu
+        $('#mySidebar a[href="module2-2.html"]').addClass("actif");
+      });
+    });
+  </script>
 
-<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
+  <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
 
-<div class="w3-main" style="margin-left:250px;">
+  <div class="w3-main" style="margin-left:250px;">
 
-<div id="myTop" class="w3-container w3-top w3-theme w3-large">
-  <p><i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()"></i>
-  <span id="myIntro" class="w3-hide">MDM4U</span></p>
-</div>
+    <!-- Barre du haut (menu sur téléphone) -->
+    <div id="myTop" class="w3-container w3-top w3-theme w3-large">
+      <p>
+        <i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()" aria-label="Ouvrir le menu"></i>
+        <span id="myIntro" class="w3-hide">MDM4U – Travail 2.2</span>
+      </p>
+    </div>
 
-<header class="w3-container w3-theme" style="padding:64px 32px">
-  <h1 class="w3-xxxlarge">Titre du module</h1>
-</header>
+    <!-- ===== En-tête ===== -->
+    <header class="w3-container w3-theme entete">
+      <p class="petit-titre">Module 2 · 2.2</p>
+      <h1 class="w3-xxxlarge">Travail 2.2</h1>
+      <p class="intro">Les mesures de tendance centrale : moyenne, médiane et mode.</p>
+    </header>
 
-<div class="w3-container" style="padding:32px">
+    <!-- ===== Contenu ===== -->
+    <main class="contenu">
 
+      <section class="carte apparait">
+        <h2><i class="fa fa-file-text-o"></i> Devoir 2.2</h2>
+        <p class="gris">Mon travail complet est dans un document Google. Tu peux l’afficher ici ou l’ouvrir dans un nouvel onglet.</p>
 
+        <div class="boutons">
+          <button class="bouton" id="btnApercu" aria-expanded="false" aria-controls="apercu">
+            <i class="fa fa-eye"></i> <span>Afficher l’aperçu</span>
+          </button>
+          <a class="bouton contour" href="https://docs.google.com/document/d/1GSNdr42vJ5gxbLFB8ifZ_uEPVKWvMlpNRIVTyB9z2_o/edit?tab=t.0" target="_blank" rel="noopener">
+            <i class="fa fa-external-link"></i> Ouvrir dans Google Docs
+          </a>
+        </div>
 
+        <!-- L'aperçu se charge seulement quand on clique sur le bouton -->
+        <div class="apercu" id="apercu">
+          <iframe title="Aperçu du devoir 2.2"
+                  data-src="https://docs.google.com/document/d/1GSNdr42vJ5gxbLFB8ifZ_uEPVKWvMlpNRIVTyB9z2_o/preview"></iframe>
+        </div>
+      </section>
 
+      <!-- ===== Outil interactif : moyenne, médiane, mode ===== -->
+      <section class="carte apparait" id="outil-stats">
+        <h2><i class="fa fa-calculator"></i> Explorer : moyenne, médiane et mode</h2>
+        <p class="gris">Écris une liste de nombres (sépare-les par des virgules ou des espaces, décimales avec un point) ou choisis un exemple. Les mesures se recalculent en direct.</p>
 
-<p><a href="https://docs.google.com/document/d/1GSNdr42vJ5gxbLFB8ifZ_uEPVKWvMlpNRIVTyB9z2_o/edit?tab=t.0">Devoir 2.2 </a></p>
+        <label for="donnees"><b>Mes données :</b></label>
+        <input id="donnees" class="w3-input w3-border w3-round" type="text" value="4, 7, 7, 8, 9, 10, 12">
 
+        <div class="puces" role="group" aria-label="Exemples de données">
+          <button class="puce" data-val="2, 3, 4, 5, 5, 5, 6, 7, 8">Symétrique</button>
+          <button class="puce" data-val="1, 2, 2, 2, 3, 3, 4, 6, 9, 14">Asymétrique à droite</button>
+          <button class="puce" data-val="45, 52, 55, 56, 57, 57, 58">Asymétrique à gauche</button>
+          <button class="puce" data-val="3, 3, 5, 5, 7, 8">Deux modes</button>
+          <button class="puce rose" id="btnAberrante"><i class="fa fa-plus"></i> Valeur aberrante</button>
+        </div>
 
-</div>
+        <div class="stats">
+          <div class="stat moyenne">Moyenne<b id="sMoy">–</b></div>
+          <div class="stat mediane">Médiane<b id="sMed">–</b></div>
+          <div class="stat mode">Mode<b id="sMode">–</b></div>
+          <div class="stat">Étendue<b id="sEt">–</b></div>
+          <div class="stat">Effectif (n)<b id="sN">–</b></div>
+        </div>
 
-<footer class="w3-container w3-theme" style="padding:32px">
-  <p>Contenu de cette page web par M. Gore (prénom: Pytha)</p>
-</footer>
-     
-</div>
+        <svg id="diagPoints" viewBox="0 0 700 220" role="img" aria-label="Diagramme à points des données"></svg>
+        <p class="legende-diag">
+          <span><i class="pastille" style="background:var(--rose)"></i> Moyenne</span>
+          <span><i class="pastille" style="background:var(--teal)"></i> Médiane</span>
+          <span><i class="pastille" style="background:#f4a100"></i> Mode</span>
+        </p>
 
-<script>
-// Open and close the sidebar on medium and small screens
-function w3_open() {
-  document.getElementById("mySidebar").style.display = "block";
-  document.getElementById("myOverlay").style.display = "block";
-}
+        <p class="gris"><b>Données en ordre :</b> <span id="ordre"></span></p>
+        <div class="explication" id="explication"></div>
+      </section>
 
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
-  document.getElementById("myOverlay").style.display = "none";
-}
+      <!-- Petit rappel théorique (cliquer pour ouvrir) -->
+      <section class="carte apparait">
+        <h2><i class="fa fa-book"></i> Rappel</h2>
+        <details>
+          <summary>Moyenne</summary>
+          <p>La somme de toutes les données divisée par le nombre de données : x̄ = Σx / n. Elle est influencée par les valeurs aberrantes.</p>
+        </details>
+        <details>
+          <summary>Médiane</summary>
+          <p>La valeur du milieu quand les données sont placées en ordre. Si n est pair, c’est la moyenne des deux valeurs du milieu. Elle résiste bien aux valeurs aberrantes.</p>
+        </details>
+        <details>
+          <summary>Mode</summary>
+          <p>La ou les valeurs qui reviennent le plus souvent. Il peut y avoir aucun mode, un mode ou plusieurs modes.</p>
+        </details>
+        <details>
+          <summary>Laquelle choisir ?</summary>
+          <p>Distribution symétrique : la moyenne. Distribution asymétrique ou avec valeurs aberrantes : la médiane. Données qualitatives ou valeur la plus fréquente : le mode.</p>
+        </details>
+      </section>
 
-// Change style of top container on scroll
-window.onscroll = function() {myFunction()};
-function myFunction() {
-  if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-    document.getElementById("myTop").classList.add("w3-card-4", "w3-animate-opacity");
-    document.getElementById("myIntro").classList.add("w3-show-inline-block");
-  } else {
-    document.getElementById("myIntro").classList.remove("w3-show-inline-block");
-    document.getElementById("myTop").classList.remove("w3-card-4", "w3-animate-opacity");
-  }
-}
+      <!-- À COMPLÉTER : enlève cette ligne et la dernière ligne du bloc, puis écris ta réflexion
+      <section class="carte apparait">
+        <h2><i class="fa fa-lightbulb-o"></i> Ce que j'ai appris</h2>
+        <p>Écris ici ce que tu as appris dans ce travail.</p>
+      </section>
+      -->
 
-</script>
-     
+      <!-- Boutons page précédente / suivante -->
+      <nav class="nav-pages" aria-label="Pages précédente et suivante">
+        <a class="bouton contour" href="module2-1.html">&larr; 2.1</a>
+        <a class="bouton" href="module2-3.html">2.3 &rarr;</a>
+      </nav>
+
+    </main>
+
+    <!-- ===== Pied de page ===== -->
+    <footer class="w3-container w3-theme" style="padding:32px">
+      <p>Contenu de cette page web par Jimi</p>
+    </footer>
+
+  </div>
+
+  <button id="retourHaut" aria-label="Retour en haut">&#8679;</button>
+
+  <script>
+    // ===== Menu sur téléphone =====
+    function w3_open() {
+      document.getElementById("mySidebar").style.display = "block";
+      document.getElementById("myOverlay").style.display = "block";
+    }
+    function w3_close() {
+      document.getElementById("mySidebar").style.display = "none";
+      document.getElementById("myOverlay").style.display = "none";
+    }
+
+    // ===== Défilement : barre du haut, progression, bouton retour =====
+    var retourHaut = document.getElementById("retourHaut");
+    retourHaut.onclick = function () { window.scrollTo({ top: 0 }); };
+
+    window.addEventListener("scroll", function () {
+      var y = document.documentElement.scrollTop || document.body.scrollTop;
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById("progression").style.width = (max > 0 ? y / max * 100 : 0) + "%";
+      retourHaut.classList.toggle("visible", y > 400);
+      document.getElementById("myTop").classList.toggle("w3-card-4", y > 80);
+      document.getElementById("myIntro").classList.toggle("w3-show-inline-block", y > 80);
+    });
+
+    // ===== Apparition des sections au défilement =====
+    var sections = document.querySelectorAll(".apparait");
+    if ("IntersectionObserver" in window) {
+      var obs = new IntersectionObserver(function (entrees) {
+        entrees.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.1 });
+      sections.forEach(function (s) { obs.observe(s); });
+    } else {
+      sections.forEach(function (s) { s.classList.add("visible"); });
+    }
+
+    // ===== Bouton Afficher / Masquer l'aperçu =====
+    var btn = document.getElementById("btnApercu");
+    var apercu = document.getElementById("apercu");
+    var cadre = apercu.querySelector("iframe");
+
+    btn.addEventListener("click", function () {
+      var ouvert = apercu.classList.toggle("ouvert");
+      if (ouvert && !cadre.src) { cadre.src = cadre.dataset.src; } // charge le document la 1re fois
+      btn.setAttribute("aria-expanded", ouvert);
+      btn.querySelector("i").className = ouvert ? "fa fa-eye-slash" : "fa fa-eye";
+      btn.querySelector("span").textContent = ouvert ? "Masquer l’aperçu" : "Afficher l’aperçu";
+    });
+
+    // ===== Outil : moyenne, médiane, mode =====
+    var champ = document.getElementById("donnees");
+    var svg = document.getElementById("diagPoints");
+
+    // Affiche un nombre à la française (virgule, 2 décimales max)
+    function fr(n) { return n.toLocaleString("fr-CA", { maximumFractionDigits: 2 }); }
+
+    // Lit les nombres écrits dans la boîte
+    function lireDonnees() {
+      return champ.value.split(/[\s,;]+/).filter(function (t) { return t !== ""; }).map(Number);
+    }
+
+    function calculer(x) {
+      var tri = x.slice().sort(function (a, b) { return a - b; });
+      var n = tri.length;
+      var somme = tri.reduce(function (a, b) { return a + b; }, 0);
+      var moyenne = somme / n;
+      var mediane = n % 2 ? tri[(n - 1) / 2] : (tri[n / 2 - 1] + tri[n / 2]) / 2;
+
+      // Fréquence de chaque valeur
+      var freq = {};
+      tri.forEach(function (v) { freq[v] = (freq[v] || 0) + 1; });
+      var fMax = Math.max.apply(null, Object.values(freq));
+      var modes = fMax > 1 ? Object.keys(freq).filter(function (v) { return freq[v] === fMax; }).map(Number) : [];
+
+      return { tri: tri, n: n, somme: somme, moyenne: moyenne, mediane: mediane, modes: modes, freq: freq, fMax: fMax };
+    }
+
+    function ecrire(id, texte) {
+      var el = document.getElementById(id);
+      if (el.textContent !== texte) {
+        el.textContent = texte;
+        el.classList.remove("change"); void el.offsetWidth; el.classList.add("change");
+      }
+    }
+
+    function dessiner(r) {
+      var W = 700, H = 220, G = 40, D = 40, BAS = 170;
+      var min = r.tri[0], max = r.tri[r.n - 1];
+      if (min === max) { min -= 1; max += 1; }
+      var marge = (max - min) * 0.08;
+      min -= marge; max += marge;
+      function px(v) { return G + (v - min) / (max - min) * (W - G - D); }
+      var rayon = Math.max(5, Math.min(8, 90 / r.fMax));
+
+      var s = '<line x1="' + G + '" x2="' + (W - D) + '" y1="' + BAS + '" y2="' + BAS + '" stroke="#5f6b76"/>';
+
+      // Graduations
+      var pas = Math.pow(10, Math.floor(Math.log10((max - min) / 5)));
+      if ((max - min) / pas > 12) pas *= 2;
+      for (var t = Math.ceil(min / pas) * pas; t <= max; t += pas) {
+        s += '<line x1="' + px(t) + '" x2="' + px(t) + '" y1="' + BAS + '" y2="' + (BAS + 6) + '" stroke="#5f6b76"/>' +
+             '<text x="' + px(t) + '" y="' + (BAS + 22) + '" font-size="12" text-anchor="middle" fill="#5f6b76">' + fr(+t.toFixed(6)) + '</text>';
+      }
+
+      // Points empilés (une pile par valeur)
+      Object.keys(r.freq).forEach(function (v) {
+        var estMode = r.modes.indexOf(+v) !== -1;
+        for (var k = 0; k < r.freq[v]; k++) {
+          s += '<circle cx="' + px(+v) + '" cy="' + (BAS - rayon - 2 - k * (rayon * 2 + 2)) + '" r="' + rayon + '" fill="' + (estMode ? "#f4a100" : "#90a4ae") + '"/>';
+        }
+      });
+
+      // Repères de la moyenne et de la médiane
+      function repere(v, couleur, nom, haut) {
+        return '<g class="repere" style="transform:translateX(' + px(v) + 'px)">' +
+          '<line x1="0" x2="0" y1="' + haut + '" y2="' + BAS + '" stroke="' + couleur + '" stroke-width="3" stroke-dasharray="6 4"/>' +
+          '<text x="0" y="' + (haut - 6) + '" font-size="13" font-weight="700" text-anchor="middle" fill="' + couleur + '">' + nom + '</text></g>';
+      }
+      s += repere(r.mediane, "#009688", "Médiane", 34);
+      s += repere(r.moyenne, "#e91e63", "Moyenne", 18 + (Math.abs(px(r.moyenne) - px(r.mediane)) < 60 ? 0 : 16));
+      svg.innerHTML = s;
+    }
+
+    function expliquer(r) {
+      var ecart = r.moyenne - r.mediane;
+      var seuil = (r.tri[r.n - 1] - r.tri[0]) * 0.05;
+      var txt = "<b>Calcul de la moyenne :</b> " + fr(r.somme) + " ÷ " + r.n + " = " + fr(r.moyenne) + ".<br>";
+      if (Math.abs(ecart) <= seuil) {
+        txt += "La moyenne et la médiane sont presque égales : la distribution semble <b>symétrique</b>. La moyenne représente bien les données.";
+      } else if (ecart > 0) {
+        txt += "La moyenne est <b>plus grande</b> que la médiane : de grandes valeurs tirent la moyenne vers la droite (<b>asymétrie à droite</b>). La médiane représente mieux les données.";
+      } else {
+        txt += "La moyenne est <b>plus petite</b> que la médiane : de petites valeurs tirent la moyenne vers la gauche (<b>asymétrie à gauche</b>). La médiane représente mieux les données.";
+      }
+      return txt;
+    }
+
+    function mettreAJour() {
+      var x = lireDonnees();
+      var explication = document.getElementById("explication");
+      if (x.length === 0 || x.some(isNaN)) {
+        explication.innerHTML = '<span class="erreur">Écris seulement des nombres (ex. : 4, 7, 7.5, 10).</span>';
+        return;
+      }
+      var r = calculer(x);
+
+      ecrire("sMoy", fr(r.moyenne));
+      ecrire("sMed", fr(r.mediane));
+      ecrire("sMode", r.modes.length ? r.modes.map(fr).join(" et ") : "Aucun");
+      ecrire("sEt", fr(r.tri[r.n - 1] - r.tri[0]));
+      ecrire("sN", String(r.n));
+
+      // Données en ordre, avec la ou les valeurs du milieu en couleur
+      var m1 = Math.floor((r.n - 1) / 2), m2 = Math.ceil((r.n - 1) / 2);
+      document.getElementById("ordre").innerHTML = r.tri.map(function (v, i) {
+        return '<span class="valeur' + (i === m1 || i === m2 ? " milieu" : "") + '">' + fr(v) + "</span>";
+      }).join("");
+
+      explication.innerHTML = expliquer(r);
+      dessiner(r);
+    }
+
+    champ.addEventListener("input", function () {
+      document.querySelectorAll(".puce.active").forEach(function (p) { p.classList.remove("active"); });
+      mettreAJour();
+    });
+
+    // Boutons d'exemples
+    document.querySelectorAll(".puce[data-val]").forEach(function (p) {
+      p.addEventListener("click", function () {
+        document.querySelectorAll(".puce.active").forEach(function (o) { o.classList.remove("active"); });
+        p.classList.add("active");
+        champ.value = p.dataset.val;
+        mettreAJour();
+      });
+    });
+
+    // Ajoute une valeur très grande pour voir l'effet sur la moyenne et la médiane
+    document.getElementById("btnAberrante").addEventListener("click", function () {
+      var x = lireDonnees().filter(function (v) { return !isNaN(v); });
+      if (!x.length) return;
+      var r = calculer(x);
+      var aberrante = Math.round(r.tri[r.n - 1] + (r.tri[r.n - 1] - r.tri[0] + 5) * 2);
+      champ.value = champ.value.trim().replace(/[,\s]+$/, "") + ", " + aberrante;
+      mettreAJour();
+    });
+
+    mettreAJour();
+  </script>
+
 </body>
-</html> 
-
+</html>
