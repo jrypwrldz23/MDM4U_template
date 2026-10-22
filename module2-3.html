@@ -1,87 +1,593 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<title>MDM4U</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
-body {font-family: "Roboto", sans-serif}
-.w3-bar-block .w3-bar-item {
-  padding: 16px;
-  font-weight: bold;
-}
-</style>
-<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travail 2.3 – MDM4U</title>
+
+  <!-- Feuilles de style du gabarit -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+    /* ===== Couleurs ===== */
+    :root {
+      --teal: #009688;
+      --teal-fonce: #00796b;
+      --rose: #e91e63;
+      --orange: #f4a100;
+      --violet: #7e57c2;
+      --texte: #1f2933;
+      --gris: #5f6b76;
+      --fond: #f4f7f7;
+      --ombre: 0 2px 10px rgba(0, 0, 0, .08);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: "Roboto", sans-serif; background: var(--fond); color: var(--texte); line-height: 1.6; }
+    .w3-bar-block .w3-bar-item { padding: 16px; font-weight: bold; }
+
+    /* Page active dans le menu */
+    #mySidebar a.actif { background: #e0f2f1 !important; border-left: 5px solid var(--teal); color: var(--teal-fonce); }
+
+    /* Barre de progression de lecture */
+    #progression { position: fixed; top: 0; left: 0; height: 4px; width: 0; background: var(--rose); z-index: 10; }
+
+    /* En-tête */
+    .entete { padding: 64px 32px 48px !important; }
+    .entete .petit-titre { text-transform: uppercase; letter-spacing: .12em; font-size: .85rem; opacity: .85; margin: 0; }
+    .entete h1 { margin: 4px 0 8px; }
+    .entete .intro { max-width: 700px; font-size: 1.1rem; margin: 0; }
+
+    /* Contenu */
+    .contenu { padding: 32px; max-width: 1100px; }
+    .carte { background: #fff; border-radius: 12px; box-shadow: var(--ombre); padding: 24px; margin-bottom: 24px; }
+    .carte h2 { margin-top: 0; color: var(--teal-fonce); }
+    .carte h3 { color: var(--teal-fonce); margin: 20px 0 8px; font-size: 1.15rem; }
+    .gris { color: var(--gris); }
+
+    /* Boutons */
+    .boutons { display: flex; gap: 12px; flex-wrap: wrap; }
+    .bouton { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; border: 2px solid var(--rose); background: var(--rose); color: #fff !important; text-decoration: none; font: inherit; font-weight: 500; cursor: pointer; transition: transform .15s; }
+    .bouton:hover { transform: translateY(-2px); }
+    .bouton.contour { background: transparent; border-color: var(--teal); color: var(--teal-fonce) !important; }
+
+    /* Aperçu du document Google */
+    .apercu { display: none; margin-top: 20px; }
+    .apercu.ouvert { display: block; animation: glisse .4s ease; }
+    .apercu iframe { width: 100%; height: 75vh; border: 1px solid #e3e8e8; border-radius: 8px; background: #fff; }
+    @keyframes glisse { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+    /* ===== Outils de dispersion ===== */
+    .puces { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 16px; }
+    .puce { border: 2px solid var(--teal); background: #fff; color: var(--teal-fonce); border-radius: 999px; padding: 6px 14px; font: inherit; font-weight: 500; cursor: pointer; }
+    .puce:hover, .puce.active { background: var(--teal); color: #fff; }
+    .puce.rose { border-color: var(--rose); color: var(--rose); }
+    .puce.rose:hover { background: var(--rose); color: #fff; }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .stat { background: #f0f4f4; border-radius: 10px; padding: 8px 12px; border-top: 4px solid #cfd8d8; font-size: .95rem; }
+    .stat b { display: block; font-size: 1.35rem; }
+    .stat.quartile { border-top-color: var(--teal); }
+    .stat.etendue { border-top-color: var(--violet); }
+    .stat.ecart { border-top-color: var(--rose); }
+    .stat b.change { animation: pulse .5s ease; }
+    @keyframes pulse { 50% { transform: scale(1.12); } }
+
+    svg.graphique { width: 100%; height: auto; display: block; background: #fff; border: 1px solid #e3e8e8; border-radius: 8px; margin-bottom: 8px; }
+    .legende-diag { display: flex; gap: 18px; flex-wrap: wrap; font-size: .95rem; color: var(--gris); }
+    .pastille { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
+
+    .interrupteur { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; margin: 8px 0; }
+    .interrupteur input { width: 18px; height: 18px; accent-color: var(--rose); }
+
+    /* Tableau des étapes de l'écart type */
+    .etapes { display: none; }
+    .etapes.ouvert { display: block; animation: glisse .4s ease; }
+    .table-defile { overflow-x: auto; }
+    table.calc { border-collapse: collapse; width: 100%; min-width: 360px; font-variant-numeric: tabular-nums; }
+    table.calc th, table.calc td { padding: 6px 10px; border-bottom: 1px solid #e3e8e8; text-align: center; }
+    table.calc th { background: #e0f2f1; color: var(--teal-fonce); }
+    table.calc tfoot td { font-weight: 700; background: #fafafa; }
+    ol.recette li { margin-bottom: 4px; }
+    .resultat { background: #fff8e1; border-left: 5px solid var(--orange); border-radius: 8px; padding: 12px 16px; margin-top: 12px; }
+    .erreur { color: var(--rose); font-weight: 500; }
+
+    /* Comparaison */
+    .deux-colonnes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .deux-colonnes input { margin-bottom: 4px; }
+
+    /* Rappel */
+    details { border-bottom: 1px solid #e3e8e8; padding: 10px 0; }
+    details summary { cursor: pointer; font-weight: 500; color: var(--teal-fonce); }
+    details p { margin: 8px 0 0; }
+    .formule { font-family: "Cambria Math", "Times New Roman", serif; font-size: 1.15rem; background: #f0f4f4; padding: 6px 12px; border-radius: 6px; display: inline-block; }
+
+    /* Boutons page précédente / suivante */
+    .nav-pages { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+
+    /* Bouton retour en haut */
+    #retourHaut { position: fixed; right: 20px; bottom: 20px; width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--teal); color: #fff; font-size: 20px; box-shadow: var(--ombre); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    #retourHaut.visible { opacity: 1; pointer-events: auto; }
+
+    /* Apparition au défilement */
+    .apparait { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
+    .apparait.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .apparait { opacity: 1; transform: none; transition: none; }
+      .apercu.ouvert, .etapes.ouvert, .stat b.change { animation: none; }
+    }
+
+    /* Téléphone */
+    @media (max-width: 600px) {
+      .contenu { padding: 16px; }
+      .entete { padding: 56px 16px 32px !important; }
+      .carte { padding: 18px; }
+      .apercu iframe { height: 65vh; }
+      .deux-colonnes { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
+
 <body>
-<!--Navigation bar-->
-<div id="nav-placeholder">
 
-</div>
+  <div id="progression"></div>
 
-<script>
-$(function(){
-  $("#nav-placeholder").load("nav.html");
-});
-</script>
-<!--end of Navigation bar-->
+  <!-- ===== Barre de navigation (chargée depuis nav.html) ===== -->
+  <div id="nav-placeholder"></div>
+  <script>
+    $(function () {
+      $("#nav-placeholder").load("nav.html", function () {
+        // Met en évidence la page actuelle dans le menu
+        $('#mySidebar a[href="module2-3.html"]').addClass("actif");
+      });
+    });
+  </script>
 
-<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
+  <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
 
-<div class="w3-main" style="margin-left:250px;">
+  <div class="w3-main" style="margin-left:250px;">
 
-<div id="myTop" class="w3-container w3-top w3-theme w3-large">
-  <p><i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()"></i>
-  <span id="myIntro" class="w3-hide">MDM4U</span></p>
-</div>
+    <!-- Barre du haut (menu sur téléphone) -->
+    <div id="myTop" class="w3-container w3-top w3-theme w3-large">
+      <p>
+        <i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()" aria-label="Ouvrir le menu"></i>
+        <span id="myIntro" class="w3-hide">MDM4U – Travail 2.3</span>
+      </p>
+    </div>
 
-<header class="w3-container w3-theme" style="padding:64px 32px">
-  <h1 class="w3-xxxlarge">Titre du module</h1>
-</header>
+    <!-- ===== En-tête ===== -->
+    <header class="w3-container w3-theme entete">
+      <p class="petit-titre">Module 2 · 2.3</p>
+      <h1 class="w3-xxxlarge">Les mesures de dispersion</h1>
+      <p class="intro">Étendue, quartiles, écart interquartile, variance et écart type : comment les données s’éloignent du centre.</p>
+    </header>
 
-<div class="w3-container" style="padding:32px">
+    <!-- ===== Contenu ===== -->
+    <main class="contenu">
 
-  
+      <!-- ===== Devoir ===== -->
+      <section class="carte apparait">
+        <h2><i class="fa fa-file-text-o"></i> Devoir 2.3</h2>
+        <p class="gris">Mon travail complet est dans un document Google. Tu peux l’afficher ici ou l’ouvrir dans un nouvel onglet.</p>
 
+        <div class="boutons">
+          <button class="bouton" id="btnApercu" aria-expanded="false" aria-controls="apercu">
+            <i class="fa fa-eye"></i> <span>Afficher l’aperçu</span>
+          </button>
+          <a class="bouton contour" href="https://docs.google.com/document/d/1cauFZ9sD7YUyRljgeWXlHIDQe3yL0LhP/edit" target="_blank" rel="noopener">
+            <i class="fa fa-external-link"></i> Ouvrir dans Google Docs
+          </a>
+        </div>
 
-<a href="https://docs.google.com/document/d/1cauFZ9sD7YUyRljgeWXlHIDQe3yL0LhP/edit"> Devoir 2.3 </a>
+        <!-- L'aperçu se charge seulement quand on clique sur le bouton -->
+        <div class="apercu" id="apercu">
+          <iframe title="Aperçu du devoir 2.3"
+                  data-src="https://docs.google.com/document/d/1cauFZ9sD7YUyRljgeWXlHIDQe3yL0LhP/preview"></iframe>
+        </div>
+      </section>
 
-</div>
+      <!-- ===== Outil 1 : explorer la dispersion ===== -->
+      <section class="carte apparait">
+        <h2><i class="fa fa-sliders"></i> Explorer la dispersion</h2>
+        <p class="gris">Écris une liste de nombres (sépare-les par des virgules ou des espaces, décimales avec un point) ou choisis un exemple de la leçon. Tout se recalcule en direct.</p>
 
-<footer class="w3-container w3-theme" style="padding:32px">
-  <p>Contenu de cette page web par M. Gore (prénom: Pytha)</p>
-</footer>
-     
-</div>
+        <label for="donnees"><b>Mes données :</b></label>
+        <input id="donnees" class="w3-input w3-border w3-round" type="text" value="6, 47, 49, 15, 43, 41, 7, 39, 43, 43, 36">
 
-<script>
-// Open and close the sidebar on medium and small screens
-function w3_open() {
-  document.getElementById("mySidebar").style.display = "block";
-  document.getElementById("myOverlay").style.display = "block";
-}
+        <div class="puces" role="group" aria-label="Exemples de données">
+          <button class="puce active" data-val="6, 47, 49, 15, 43, 41, 7, 39, 43, 43, 36">Exemple 1 de la leçon</button>
+          <button class="puce" data-val="34, 41, 40, 38, 38, 45">Dalles de Yassine</button>
+          <button class="puce" data-val="51, 28, 36, 44, 41, 46">Dalles de Hana</button>
+          <button class="puce" data-val="48, 49, 50, 50, 50, 51, 52">Faible dispersion</button>
+          <button class="puce" data-val="10, 22, 35, 50, 64, 78, 90">Forte dispersion</button>
+          <button class="puce rose" id="btnAberrante"><i class="fa fa-plus"></i> Valeur aberrante</button>
+        </div>
 
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
-  document.getElementById("myOverlay").style.display = "none";
-}
+        <div class="stats">
+          <div class="stat">Minimum<b id="sMin">–</b></div>
+          <div class="stat quartile">Q1<b id="sQ1">–</b></div>
+          <div class="stat quartile">Médiane (Q2)<b id="sQ2">–</b></div>
+          <div class="stat quartile">Q3<b id="sQ3">–</b></div>
+          <div class="stat">Maximum<b id="sMax">–</b></div>
+          <div class="stat etendue">Étendue<b id="sEt">–</b></div>
+          <div class="stat etendue">Écart interquartile<b id="sIQ">–</b></div>
+          <div class="stat">Moyenne x̄<b id="sMoy">–</b></div>
+          <div class="stat ecart">Variance σ²<b id="sVar">–</b></div>
+          <div class="stat ecart">Écart type σ<b id="sSig">–</b></div>
+        </div>
 
-// Change style of top container on scroll
-window.onscroll = function() {myFunction()};
-function myFunction() {
-  if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-    document.getElementById("myTop").classList.add("w3-card-4", "w3-animate-opacity");
-    document.getElementById("myIntro").classList.add("w3-show-inline-block");
-  } else {
-    document.getElementById("myIntro").classList.remove("w3-show-inline-block");
-    document.getElementById("myTop").classList.remove("w3-card-4", "w3-animate-opacity");
-  }
-}
+        <h3>Diagramme à boîte et moustaches</h3>
+        <label class="interrupteur"><input type="checkbox" id="voirSigma" checked> Afficher la zone x̄ ± σ</label>
+        <svg id="diagBoite" class="graphique" viewBox="0 0 700 250" role="img" aria-label="Diagramme à boîte et moustaches et diagramme à points"></svg>
+        <p class="legende-diag">
+          <span><i class="pastille" style="background:#b2dfdb"></i> Boîte : de Q1 à Q3 (la moitié centrale des données)</span>
+          <span><i class="pastille" style="background:var(--violet)"></i> Étendue</span>
+          <span><i class="pastille" style="background:#f8bbd0"></i> x̄ ± σ</span>
+        </p>
+        <div class="resultat" id="interpretation"></div>
 
-</script>
-     
+        <h3>Calcul de l’écart type, étape par étape</h3>
+        <button class="bouton contour" id="btnEtapes" aria-expanded="false" aria-controls="etapes">
+          <i class="fa fa-list-ol"></i> <span>Afficher les étapes</span>
+        </button>
+        <div class="etapes" id="etapes">
+          <ol class="recette">
+            <li>Trouve la moyenne : <b id="e1"></b></li>
+            <li>Soustrais la moyenne de chaque valeur (colonne x − x̄).</li>
+            <li>Fais le carré de chacune de ces différences (colonne (x − x̄)²).</li>
+            <li>Trouve la moyenne de ces carrés, c’est la <b>variance</b> : <b id="e4"></b></li>
+            <li>Trouve la racine carrée de la variance, c’est l’<b>écart type</b> : <b id="e5"></b></li>
+          </ol>
+          <div class="table-defile">
+            <table class="calc">
+              <thead><tr><th>x</th><th>x − x̄</th><th>(x − x̄)²</th></tr></thead>
+              <tbody id="corpsTable"></tbody>
+              <tfoot><tr><td id="sommeX"></td><td>Σ = 0</td><td id="sommeCarres"></td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Outil 2 : comparer deux ensembles ===== -->
+      <section class="carte apparait">
+        <h2><i class="fa fa-balance-scale"></i> Comparer deux ensembles : Yassine et Hana</h2>
+        <p class="gris">Nombre de dalles posées par heure, de 13 h à 19 h (exemple de la leçon). Modifie les données pour voir comment la comparaison change.</p>
+
+        <div class="deux-colonnes">
+          <div>
+            <label for="donneesA"><b style="color:var(--teal-fonce)">Yassine :</b></label>
+            <input id="donneesA" class="w3-input w3-border w3-round" type="text" value="34, 41, 40, 38, 38, 45">
+          </div>
+          <div>
+            <label for="donneesB"><b style="color:var(--rose)">Hana :</b></label>
+            <input id="donneesB" class="w3-input w3-border w3-round" type="text" value="51, 28, 36, 44, 41, 46">
+          </div>
+        </div>
+
+        <svg id="diagCompare" class="graphique" viewBox="0 0 700 200" role="img" aria-label="Comparaison de deux diagrammes à boîte" style="margin-top:16px"></svg>
+        <div class="table-defile">
+          <table class="calc">
+            <thead><tr><th style="text-align:left"></th><th>Total</th><th>Moyenne</th><th>Étendue</th><th>Écart interquartile</th><th>Écart type σ</th></tr></thead>
+            <tbody id="corpsCompare"></tbody>
+          </table>
+        </div>
+        <div class="resultat" id="conclusion"></div>
+      </section>
+
+      <!-- ===== Rappel de la leçon ===== -->
+      <section class="carte apparait">
+        <h2><i class="fa fa-book"></i> Rappel de la leçon</h2>
+        <details>
+          <summary>L’étendue</summary>
+          <p>La différence entre la plus grande et la plus petite valeur : <span class="formule">étendue = max − min</span>. Exemple 1 : 49 − 6 = 43.</p>
+        </details>
+        <details>
+          <summary>Les quartiles</summary>
+          <p>Les quartiles divisent les données en quatre parties égales. Q2 est la médiane. Q1 est la médiane de la moitié inférieure et Q3 la médiane de la moitié supérieure (sans la médiane quand n est impair).</p>
+        </details>
+        <details>
+          <summary>L’écart interquartile</summary>
+          <p><span class="formule">IQ = Q3 − Q1</span>. Il contient la moitié centrale des données. Exemple 1 : 43 − 15 = 28.</p>
+        </details>
+        <details>
+          <summary>La variance et l’écart type</summary>
+          <p>Un écart est la distance entre une valeur et la moyenne. L’écart type mesure la distance moyenne des données par rapport à la moyenne : petit si les valeurs sont proches de la moyenne, grand si elles sont dispersées.</p>
+          <p><span class="formule">σ² = Σ(xᵢ − x̄)² ÷ n</span> &nbsp; <span class="formule">σ = √[ Σ(xᵢ − x̄)² ÷ n ]</span></p>
+        </details>
+        <details>
+          <summary>L’écart type à partir d’un tableau de fréquences</summary>
+          <p>On multiplie chaque carré par sa fréquence fᵢ : <span class="formule">σ = √[ Σ(xᵢ − x̄)²·fᵢ ÷ Σfᵢ ]</span></p>
+        </details>
+      </section>
+
+      <!-- À COMPLÉTER : enlève cette ligne et la dernière ligne du bloc, puis écris ta réflexion
+      <section class="carte apparait">
+        <h2><i class="fa fa-lightbulb-o"></i> Ce que j'ai appris</h2>
+        <p>Écris ici ce que tu as appris dans ce travail.</p>
+      </section>
+      -->
+
+      <!-- Boutons page précédente / suivante -->
+      <nav class="nav-pages" aria-label="Pages précédente et suivante">
+        <a class="bouton contour" href="module2-2.html">&larr; 2.2</a>
+        <a class="bouton" href="module2-4.html">2.4 &rarr;</a>
+      </nav>
+
+    </main>
+
+    <!-- ===== Pied de page ===== -->
+    <footer class="w3-container w3-theme" style="padding:32px">
+      <p>Contenu de cette page web par Jimi</p>
+    </footer>
+
+  </div>
+
+  <button id="retourHaut" aria-label="Retour en haut">&#8679;</button>
+
+  <script>
+    // ===== Menu sur téléphone =====
+    function w3_open() {
+      document.getElementById("mySidebar").style.display = "block";
+      document.getElementById("myOverlay").style.display = "block";
+    }
+    function w3_close() {
+      document.getElementById("mySidebar").style.display = "none";
+      document.getElementById("myOverlay").style.display = "none";
+    }
+
+    // ===== Défilement : barre du haut, progression, bouton retour =====
+    var retourHaut = document.getElementById("retourHaut");
+    retourHaut.onclick = function () { window.scrollTo({ top: 0 }); };
+
+    window.addEventListener("scroll", function () {
+      var y = document.documentElement.scrollTop || document.body.scrollTop;
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById("progression").style.width = (max > 0 ? y / max * 100 : 0) + "%";
+      retourHaut.classList.toggle("visible", y > 400);
+      document.getElementById("myTop").classList.toggle("w3-card-4", y > 80);
+      document.getElementById("myIntro").classList.toggle("w3-show-inline-block", y > 80);
+    });
+
+    // ===== Apparition des sections au défilement =====
+    var sections = document.querySelectorAll(".apparait");
+    if ("IntersectionObserver" in window) {
+      var obs = new IntersectionObserver(function (entrees) {
+        entrees.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.1 });
+      sections.forEach(function (s) { obs.observe(s); });
+    } else {
+      sections.forEach(function (s) { s.classList.add("visible"); });
+    }
+
+    // ===== Bouton qui ouvre / ferme un bloc =====
+    function bascule(idBouton, idBloc, texteOuvrir, texteFermer, auPremierClic) {
+      var b = document.getElementById(idBouton), bloc = document.getElementById(idBloc);
+      b.addEventListener("click", function () {
+        var ouvert = bloc.classList.toggle("ouvert");
+        if (ouvert && auPremierClic) { auPremierClic(); auPremierClic = null; }
+        b.setAttribute("aria-expanded", ouvert);
+        b.querySelector("span").textContent = ouvert ? texteFermer : texteOuvrir;
+      });
+    }
+    bascule("btnApercu", "apercu", "Afficher l’aperçu", "Masquer l’aperçu", function () {
+      var cadre = document.querySelector("#apercu iframe");
+      cadre.src = cadre.dataset.src; // charge le document seulement la 1re fois
+    });
+    bascule("btnEtapes", "etapes", "Afficher les étapes", "Masquer les étapes");
+
+    // ===== Fonctions de calcul =====
+    // Affiche un nombre à la française (virgule, 2 décimales max)
+    function fr(n, d) { return n.toLocaleString("fr-CA", { maximumFractionDigits: d === undefined ? 2 : d }); }
+
+    // Lit les nombres écrits dans une boîte
+    function lire(champ) {
+      return champ.value.split(/[\s,;]+/).filter(function (t) { return t !== ""; }).map(Number);
+    }
+    function valide(x) { return x.length > 0 && !x.some(isNaN); }
+
+    function mediane(t) {
+      var n = t.length;
+      return n % 2 ? t[(n - 1) / 2] : (t[n / 2 - 1] + t[n / 2]) / 2;
+    }
+
+    // Toutes les mesures (méthode de la leçon : la médiane n'est pas incluse dans les moitiés)
+    function mesures(x) {
+      var t = x.slice().sort(function (a, b) { return a - b; });
+      var n = t.length, moitie = Math.floor(n / 2);
+      var somme = t.reduce(function (a, b) { return a + b; }, 0);
+      var moy = somme / n;
+      var sommeCarres = t.reduce(function (a, v) { return a + Math.pow(v - moy, 2); }, 0);
+      var q1 = n > 1 ? mediane(t.slice(0, moitie)) : t[0];
+      var q3 = n > 1 ? mediane(t.slice(n - moitie)) : t[0];
+      return {
+        tri: t, n: n, somme: somme, moy: moy, min: t[0], max: t[n - 1],
+        q1: q1, q2: mediane(t), q3: q3, iq: q3 - q1, etendue: t[n - 1] - t[0],
+        sommeCarres: sommeCarres, variance: sommeCarres / n, sigma: Math.sqrt(sommeCarres / n)
+      };
+    }
+
+    function ecrire(id, texte) {
+      var el = document.getElementById(id);
+      if (el.textContent !== texte) {
+        el.textContent = texte;
+        el.classList.remove("change"); void el.offsetWidth; el.classList.add("change");
+      }
+    }
+
+    // Échelle horizontale commune à un ou plusieurs ensembles
+    function echelle(liste, G, D, W) {
+      var min = Math.min.apply(null, liste.map(function (m) { return Math.min(m.min, m.moy - m.sigma); }));
+      var max = Math.max.apply(null, liste.map(function (m) { return Math.max(m.max, m.moy + m.sigma); }));
+      if (min === max) { min -= 1; max += 1; }
+      var marge = (max - min) * 0.05; min -= marge; max += marge;
+      return { min: min, max: max, px: function (v) { return G + (v - min) / (max - min) * (W - G - D); } };
+    }
+
+    function axe(e, y, G, D, W) {
+      var s = '<line x1="' + G + '" x2="' + (W - D) + '" y1="' + y + '" y2="' + y + '" stroke="#5f6b76"/>';
+      var pas = Math.pow(10, Math.floor(Math.log10((e.max - e.min) / 5)));
+      if ((e.max - e.min) / pas > 12) pas *= 2;
+      if ((e.max - e.min) / pas > 12) pas *= 2.5;
+      for (var t = Math.ceil(e.min / pas) * pas; t <= e.max; t += pas) {
+        s += '<line x1="' + e.px(t) + '" x2="' + e.px(t) + '" y1="' + y + '" y2="' + (y + 6) + '" stroke="#5f6b76"/>' +
+             '<text x="' + e.px(t) + '" y="' + (y + 20) + '" font-size="12" text-anchor="middle" fill="#5f6b76">' + fr(+t.toFixed(6)) + '</text>';
+      }
+      return s;
+    }
+
+    // Dessine une boîte à moustaches centrée sur la hauteur y
+    function boite(m, e, y, h, couleur, remplissage, etiquettes) {
+      var px = e.px, s = "";
+      s += '<line x1="' + px(m.min) + '" x2="' + px(m.q1) + '" y1="' + y + '" y2="' + y + '" stroke="' + couleur + '" stroke-width="2"/>';
+      s += '<line x1="' + px(m.q3) + '" x2="' + px(m.max) + '" y1="' + y + '" y2="' + y + '" stroke="' + couleur + '" stroke-width="2"/>';
+      [m.min, m.max].forEach(function (v) {
+        s += '<line x1="' + px(v) + '" x2="' + px(v) + '" y1="' + (y - h / 3) + '" y2="' + (y + h / 3) + '" stroke="' + couleur + '" stroke-width="2"/>';
+      });
+      s += '<rect x="' + px(m.q1) + '" y="' + (y - h / 2) + '" width="' + Math.max(1, px(m.q3) - px(m.q1)) + '" height="' + h + '" fill="' + remplissage + '" stroke="' + couleur + '" stroke-width="2" rx="3"/>';
+      s += '<line x1="' + px(m.q2) + '" x2="' + px(m.q2) + '" y1="' + (y - h / 2) + '" y2="' + (y + h / 2) + '" stroke="' + couleur + '" stroke-width="3"/>';
+      if (etiquettes) {
+        [["Min", m.min], ["Q1", m.q1], ["Q2", m.q2], ["Q3", m.q3], ["Max", m.max]].forEach(function (p, i) {
+          var yy = i % 2 ? y + h / 2 + 16 : y - h / 2 - 6;
+          s += '<text x="' + px(p[1]) + '" y="' + yy + '" font-size="12" font-weight="700" text-anchor="middle" fill="' + couleur + '">' + p[0] + '</text>';
+        });
+      }
+      return s;
+    }
+
+    // ===== Outil 1 : explorer =====
+    var champ = document.getElementById("donnees");
+    var voirSigma = document.getElementById("voirSigma");
+
+    function dessinerBoite(m) {
+      var W = 700, G = 30, D = 30, e = echelle([m], G, D, W), px = e.px, s = "";
+
+      // Zone x̄ ± σ
+      if (voirSigma.checked) {
+        s += '<rect x="' + px(m.moy - m.sigma) + '" y="10" width="' + (px(m.moy + m.sigma) - px(m.moy - m.sigma)) + '" height="200" fill="#f8bbd0" opacity=".45"/>' +
+             '<line x1="' + px(m.moy) + '" x2="' + px(m.moy) + '" y1="10" y2="210" stroke="#e91e63" stroke-width="2" stroke-dasharray="6 4"/>' +
+             '<text x="' + px(m.moy) + '" y="24" font-size="12" font-weight="700" text-anchor="middle" fill="#e91e63">x̄ ± σ</text>';
+      }
+
+      // Accolade de l'étendue
+      s += '<line x1="' + px(m.min) + '" x2="' + px(m.max) + '" y1="40" y2="40" stroke="#7e57c2" stroke-width="2"/>' +
+           '<line x1="' + px(m.min) + '" x2="' + px(m.min) + '" y1="34" y2="46" stroke="#7e57c2" stroke-width="2"/>' +
+           '<line x1="' + px(m.max) + '" x2="' + px(m.max) + '" y1="34" y2="46" stroke="#7e57c2" stroke-width="2"/>' +
+           '<text x="' + (px(m.min) + px(m.max)) / 2 + '" y="58" font-size="12" text-anchor="middle" fill="#7e57c2">étendue = ' + fr(m.etendue) + '</text>';
+
+      s += boite(m, e, 100, 34, "#00796b", "#b2dfdb", true);
+
+      // Diagramme à points
+      var compte = {};
+      m.tri.forEach(function (v) {
+        compte[v] = (compte[v] || 0) + 1;
+        s += '<circle cx="' + px(v) + '" cy="' + (205 - (compte[v] - 1) * 11) + '" r="5" fill="#90a4ae"/>';
+      });
+      s += axe(e, 212, G, D, W);
+      document.getElementById("diagBoite").innerHTML = s;
+    }
+
+    function remplirEtapes(m) {
+      document.getElementById("e1").textContent = fr(m.somme) + " ÷ " + m.n + " = " + fr(m.moy);
+      document.getElementById("e4").textContent = fr(m.sommeCarres) + " ÷ " + m.n + " = " + fr(m.variance);
+      document.getElementById("e5").textContent = "√" + fr(m.variance) + " = " + fr(m.sigma);
+      document.getElementById("corpsTable").innerHTML = m.tri.map(function (v) {
+        var d = v - m.moy;
+        return "<tr><td>" + fr(v) + "</td><td>" + fr(d) + "</td><td>" + fr(d * d) + "</td></tr>";
+      }).join("");
+      document.getElementById("sommeX").textContent = "Σx = " + fr(m.somme);
+      document.getElementById("sommeCarres").textContent = "Σ = " + fr(m.sommeCarres);
+    }
+
+    function interpreter(m) {
+      var cv = m.moy !== 0 ? m.sigma / Math.abs(m.moy) : 0;
+      var dans = m.tri.filter(function (v) { return Math.abs(v - m.moy) <= m.sigma; }).length;
+      var txt = "<b>" + dans + " données sur " + m.n + "</b> (" + fr(dans / m.n * 100, 0) + " %) sont à moins d’un écart type de la moyenne (entre " +
+                fr(m.moy - m.sigma) + " et " + fr(m.moy + m.sigma) + ").<br>";
+      if (cv < 0.1) txt += "L’écart type est <b>petit</b> par rapport à la moyenne : les valeurs sont proches de la moyenne, la dispersion est <b>faible</b>.";
+      else if (cv < 0.3) txt += "L’écart type est <b>moyen</b> par rapport à la moyenne : la dispersion est <b>modérée</b>.";
+      else txt += "L’écart type est <b>grand</b> par rapport à la moyenne : les valeurs sont très étalées, la dispersion est <b>forte</b>.";
+      if (m.iq < m.etendue / 3) txt += "<br>L’écart interquartile (" + fr(m.iq) + ") est beaucoup plus petit que l’étendue (" + fr(m.etendue) + ") : quelques valeurs extrêmes étirent l’étendue.";
+      return txt;
+    }
+
+    function mettreAJour() {
+      var x = lire(champ), sortie = document.getElementById("interpretation");
+      if (!valide(x)) { sortie.innerHTML = '<span class="erreur">Écris seulement des nombres (ex. : 4, 7, 7.5, 10).</span>'; return; }
+      var m = mesures(x);
+      ecrire("sMin", fr(m.min)); ecrire("sQ1", fr(m.q1)); ecrire("sQ2", fr(m.q2)); ecrire("sQ3", fr(m.q3)); ecrire("sMax", fr(m.max));
+      ecrire("sEt", fr(m.etendue)); ecrire("sIQ", fr(m.iq)); ecrire("sMoy", fr(m.moy));
+      ecrire("sVar", fr(m.variance)); ecrire("sSig", fr(m.sigma));
+      dessinerBoite(m);
+      remplirEtapes(m);
+      sortie.innerHTML = interpreter(m);
+    }
+
+    champ.addEventListener("input", function () {
+      document.querySelectorAll(".puce.active").forEach(function (p) { p.classList.remove("active"); });
+      mettreAJour();
+    });
+    voirSigma.addEventListener("change", mettreAJour);
+
+    document.querySelectorAll(".puce[data-val]").forEach(function (p) {
+      p.addEventListener("click", function () {
+        document.querySelectorAll(".puce.active").forEach(function (o) { o.classList.remove("active"); });
+        p.classList.add("active");
+        champ.value = p.dataset.val;
+        mettreAJour();
+      });
+    });
+
+    // Ajoute une valeur extrême pour voir quelles mesures changent beaucoup
+    document.getElementById("btnAberrante").addEventListener("click", function () {
+      var x = lire(champ);
+      if (!valide(x)) return;
+      var m = mesures(x);
+      champ.value = champ.value.trim().replace(/[,\s]+$/, "") + ", " + Math.round(m.max + (m.etendue + 5) * 1.5);
+      mettreAJour();
+    });
+
+    // ===== Outil 2 : comparer Yassine et Hana =====
+    var champA = document.getElementById("donneesA"), champB = document.getElementById("donneesB");
+
+    function comparer() {
+      var a = lire(champA), b = lire(champB), sortie = document.getElementById("conclusion");
+      if (!valide(a) || !valide(b)) { sortie.innerHTML = '<span class="erreur">Écris seulement des nombres dans les deux boîtes.</span>'; return; }
+      var A = mesures(a), B = mesures(b);
+      var W = 700, G = 30, D = 30, e = echelle([A, B], G, D, W);
+
+      var s = '<text x="' + G + '" y="22" font-size="13" font-weight="700" fill="#00796b">Yassine</text>' +
+              boite(A, e, 50, 30, "#00796b", "#b2dfdb", false) +
+              '<text x="' + G + '" y="97" font-size="13" font-weight="700" fill="#e91e63">Hana</text>' +
+              boite(B, e, 125, 30, "#e91e63", "#f8bbd0", false) +
+              axe(e, 165, G, D, W);
+      document.getElementById("diagCompare").innerHTML = s;
+
+      function ligne(nom, couleur, m) {
+        return '<tr><td style="text-align:left;color:' + couleur + ';font-weight:700">' + nom + "</td><td>" + fr(m.somme) + "</td><td>" + fr(m.moy) +
+               "</td><td>" + fr(m.etendue) + "</td><td>" + fr(m.iq) + "</td><td>" + fr(m.sigma) + "</td></tr>";
+      }
+      document.getElementById("corpsCompare").innerHTML = ligne("Yassine", "#00796b", A) + ligne("Hana", "#e91e63", B);
+
+      var plus = A.somme === B.somme ? "Les deux posent le même nombre de dalles" :
+                 (A.somme > B.somme ? "<b>Yassine</b>" : "<b>Hana</b>") + " pose le plus de dalles (" + fr(Math.max(A.somme, B.somme)) + " contre " + fr(Math.min(A.somme, B.somme)) + ")";
+      var regulier = Math.abs(A.sigma - B.sigma) < 0.05 ? "Les deux ont à peu près la même régularité." :
+                 (A.sigma < B.sigma ? "<b>Yassine</b>" : "<b>Hana</b>") + " a le plus petit écart type (" + fr(Math.min(A.sigma, B.sigma)) + " contre " + fr(Math.max(A.sigma, B.sigma)) +
+                 ") : son rythme de travail est <b>plus constant</b> d’heure en heure.";
+      sortie.innerHTML = plus + ".<br>" + regulier;
+    }
+    champA.addEventListener("input", comparer);
+    champB.addEventListener("input", comparer);
+
+    mettreAJour();
+    comparer();
+  </script>
+
 </body>
-</html> 
+</html>
