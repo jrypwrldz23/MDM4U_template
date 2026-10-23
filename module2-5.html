@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travail 2.5 – MDM4U</title>
+
+  <!-- Feuilles de style du gabarit -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+    :root { --teal: #009688; --teal-fonce: #00796b; --gris: #5f6b76; --fond: #f4f7f7; }
+
+    body { font-family: "Roboto", sans-serif; background: var(--fond); line-height: 1.6; }
+    .w3-bar-block .w3-bar-item { padding: 16px; font-weight: bold; }
+    #mySidebar a.actif { background: #e0f2f1 !important; border-left: 5px solid var(--teal); }
+
+    .contenu { padding: 32px; max-width: 1000px; }
+    .carte { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.08); padding: 24px; margin-bottom: 24px; }
+    .carte h2 { margin-top: 0; color: var(--teal-fonce); }
+
+    /* Vidéo qui s'adapte à la largeur de l'écran */
+    .video { position: relative; width: 100%; max-width: 800px; aspect-ratio: 16 / 9; }
+    .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 8px; }
+
+    @media (max-width: 600px) { .contenu { padding: 16px; } }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Barre de navigation (chargée depuis nav.html) -->
+  <div id="nav-placeholder"></div>
+  <script>
+    $(function () {
+      $("#nav-placeholder").load("nav.html", function () {
+        $('#mySidebar a[href="module2-5.html"]').addClass("actif");
+      });
+    });
+  </script>
+
+  <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
+
+  <div class="w3-main" style="margin-left:250px;">
+
+    <div id="myTop" class="w3-container w3-top w3-theme w3-large">
+      <p><i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()"></i>
+      <span id="myIntro" class="w3-hide">MDM4U – Travail 2.5</span></p>
+    </div>
+
+    <header class="w3-container w3-theme" style="padding:64px 32px">
+      <h1 class="w3-xxxlarge">Travail 2.5</h1>
+    </header>
+
+    <main class="contenu">
+
+      <!-- Vidéo 1 -->
+      <section class="carte">
+        <h2><i class="fa fa-youtube-play"></i> Vidéo 1</h2>
+        <div class="video">
+          <iframe src="https://www.youtube.com/embed/tjGkp_PvKnk" title="Vidéo 1"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </section>
+
+      <!-- Vidéo 2 -->
+      <section class="carte">
+        <h2><i class="fa fa-youtube-play"></i> Vidéo 2</h2>
+        <div class="video">
+          <iframe src="https://www.youtube.com/embed/PAQsTLz3HNE" title="Vidéo 2"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="w3-container w3-theme" style="padding:32px">
+      <p>Contenu de cette page web par Jimi</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Menu sur téléphone
+    function w3_open() {
+      document.getElementById("mySidebar").style.display = "block";
+      document.getElementById("myOverlay").style.display = "block";
+    }
+    function w3_close() {
+      document.getElementById("mySidebar").style.display = "none";
+      document.getElementById("myOverlay").style.display = "none";
+    }
+
+    // Barre du haut quand on défile
+    window.onscroll = function () {
+      var bas = document.documentElement.scrollTop > 80;
+      document.getElementById("myTop").classList.toggle("w3-card-4", bas);
+      document.getElementById("myIntro").classList.toggle("w3-show-inline-block", bas);
+    };
+  </script>
+
+</body>
+</html>
