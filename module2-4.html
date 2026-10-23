@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Travail 1.4 – MDM4U</title>
+  <title>Travail 2.4 – MDM4U</title>
 
   <!-- Feuilles de style du gabarit -->
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -26,11 +26,14 @@
     .bouton { display: inline-block; padding: 10px 18px; border-radius: 999px; background: var(--rose); color: #fff !important; text-decoration: none; font-weight: 500; }
     .bouton:hover { opacity: .9; }
 
-    /* Vidéo qui s'adapte à la largeur de l'écran */
-    .video { position: relative; width: 100%; max-width: 800px; aspect-ratio: 16 / 9; }
-    .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 8px; }
+    /* Photos du devoir */
+    .photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .photos figure { margin: 0; border: 1px solid #e3e8e8; border-radius: 10px; overflow: hidden; }
+    .photos img { width: 100%; display: block; }
+    .photos figcaption { padding: 8px 12px; color: var(--gris); font-size: .95rem; }
 
-    @media (max-width: 600px) { .contenu { padding: 16px; } }
+    @media (max-width: 800px) { .photos { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .contenu { padding: 16px; } .photos { grid-template-columns: 1fr; } }
   </style>
 
   <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -43,7 +46,7 @@
   <script>
     $(function () {
       $("#nav-placeholder").load("nav.html", function () {
-        $('#mySidebar a[href="module1-4.html"]').addClass("actif");
+        $('#mySidebar a[href="module2-4.html"]').addClass("actif");
       });
     });
   </script>
@@ -54,31 +57,41 @@
 
     <div id="myTop" class="w3-container w3-top w3-theme w3-large">
       <p><i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()"></i>
-      <span id="myIntro" class="w3-hide">MDM4U – Travail 1.4</span></p>
+      <span id="myIntro" class="w3-hide">MDM4U – Travail 2.4</span></p>
     </div>
 
     <header class="w3-container w3-theme" style="padding:64px 32px">
-      <h1 class="w3-xxxlarge">1.4 – Révision statistique</h1>
+      <h1 class="w3-xxxlarge">2.4 – La distribution normale</h1>
     </header>
 
     <main class="contenu">
 
-      <!-- Devoir -->
+      <!-- Partie papier-crayon -->
       <section class="carte">
-        <h2><i class="fa fa-file-text-o"></i> Révision statistique</h2>
-        <p class="gris">Mon travail de révision est dans un document Google.</p>
-        <a class="bouton" href="https://docs.google.com/document/d/1nEn9IVxn2xiB-pFQ-qAaKxvsFb8Op46ziiAOdV_jKCk/edit?tab=t.0" target="_blank" rel="noopener">
-          Ouvrir mon devoir <i class="fa fa-external-link"></i>
-        </a>
+        <h2><i class="fa fa-pencil"></i> Devoir 2.4 – partie papier-crayon</h2>
+        <div class="photos">
+          <figure>
+            <img src="IMG_2906%202.jpg" alt="Devoir 2.4, page 1">
+            <figcaption>Page 1</figcaption>
+          </figure>
+          <figure>
+            <img src="IMG_2907%202.jpg" alt="Devoir 2.4, page 2">
+            <figcaption>Page 2</figcaption>
+          </figure>
+          <figure>
+            <img src="IMG_2909.jpg" alt="Devoir 2.4, page 3">
+            <figcaption>Page 3</figcaption>
+          </figure>
+        </div>
       </section>
 
-      <!-- Vidéo -->
+      <!-- Partie technologie -->
       <section class="carte">
-        <h2><i class="fa fa-youtube-play"></i> Vidéo</h2>
-        <div class="video">
-          <iframe src="https://www.youtube.com/embed/Ui8o6fJjkck" title="Vidéo de révision"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
+        <h2><i class="fa fa-file-text-o"></i> Devoir 2.4B – partie technologie</h2>
+        <p class="gris">Mon travail est dans un document Google.</p>
+        <a class="bouton" href="https://docs.google.com/document/d/1ME1hv4-PGO5Io0OfhZ-kkcQjcR-CLbW-uWpNwZoiV3Y/edit?tab=t.0" target="_blank" rel="noopener">
+          Ouvrir le devoir 2.4B <i class="fa fa-external-link"></i>
+        </a>
       </section>
 
     </main>
