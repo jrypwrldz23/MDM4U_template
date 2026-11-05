@@ -1,0 +1,227 @@
+// Neon Snake — a simple canvas game. No libraries needed.
+
+const canvas = document.getElementById("board");
+const ctx = canvas.getContext("2d");
+const scoreEl = document.getElementById("score");
+const bestEl = document.getElementById("best");
+const overlay = document.getElementById("overlay");
+const overlayTitle = document.getElementById("overlay-title");
+const overlayText = document.getElementById("overlay-text");
+const startBtn = document.getElementById("start-btn");
+
+const GRID = 20;                    // cells per side
+const CELL = canvas.width / GRID;   // pixel size of a cell
+const START_SPEED = 130;            // ms per step (lower = faster)
+const MIN_SPEED = 60;
+
+let snake, dir, nextDirs, food, score, speed, timer, running, paused, particles;
+
+let best = 0;
+try { best = Number(localStorage.getItem("neonSnakeBest")) || 0; } catch {}
+bestEl.textContent = best;
+
+function reset() {
+  snake = [{ x: 9, y: 10 }, { x: 8, y: 10 }, { x: 7, y: 10 }];
+  dir = { x: 1, y: 0 };
+  nextDirs = [];
+  score = 0;
+  speed = START_SPEED;
+  particles = [];
+  scoreEl.textContent = 0;
+  placeFood();
+}
+
+function placeFood() {
+  do {
+    food = { x: rand(GRID), y: rand(GRID) };
+  } while (snake.some(s => s.x === food.x && s.y === food.y));
+}
+
+function rand(n) { return Math.floor(Math.random() * n); }
+
+function start() {
+  reset();
+  running = true;
+  paused = false;
+  overlay.classList.add("hidden");
+  loop();
+}
+
+function loop() {
+  clearTimeout(timer);
+  if (!running || paused) return;
+  step();
+  draw();
+  timer = setTimeout(loop, speed);
+}
+
+function step() {
+  if (nextDirs.length) dir = nextDirs.shift();
+
+  const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+  const hitWall = head.x < 0 || head.y < 0 || head.x >= GRID || head.y >= GRID;
+  const hitSelf = snake.some(s => s.x === head.x && s.y === head.y);
+  if (hitWall || hitSelf) return gameOver();
+
+  snake.unshift(head);
+
+  if (head.x === food.x && head.y === food.y) {
+    score++;
+    scoreEl.textContent = score;
+    burst(food.x, food.y);
+    speed = Math.max(MIN_SPEED, speed - 3);
+    placeFood();
+  } else {
+    snake.pop();
+  }
+}
+
+function burst(cx, cy) {
+  for (let i = 0; i < 14; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const v = 1 + Math.random() * 3;
+    particles.push({
+      x: (cx + 0.5) * CELL, y: (cy + 0.5) * CELL,
+      vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1,
+    });
+  }
+}
+
+function draw() {
+  ctx.fillStyle = "#0d0b1e";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // subtle grid
+  ctx.strokeStyle = "#ffffff08";
+  for (let i = 1; i < GRID; i++) {
+    ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke();
+  }
+
+  // food
+  const pulse = 0.75 + Math.sin(Date.now() / 150) * 0.15;
+  ctx.shadowBlur = 18;
+  ctx.shadowColor = "#ff5fa2";
+  ctx.fillStyle = "#ff5fa2";
+  ctx.beginPath();
+  ctx.arc((food.x + 0.5) * CELL, (food.y + 0.5) * CELL, (CELL / 2) * pulse, 0, Math.PI * 2);
+  ctx.fill();
+
+  // snake
+  ctx.shadowColor = "#6ef3c5";
+  snake.forEach((s, i) => {
+    const t = i / snake.length;
+    ctx.shadowBlur = i === 0 ? 20 : 8;
+    ctx.fillStyle = `hsl(${160 - t * 40}, 85%, ${68 - t * 25}%)`;
+    roundRect(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2, 5);
+  });
+  ctx.shadowBlur = 0;
+
+  // eyes
+  const h = snake[0];
+  ctx.fillStyle = "#07060f";
+  const ex = dir.y !== 0 ? 4 : 0, ey = dir.x !== 0 ? 4 : 0;
+  const cx = (h.x + 0.5) * CELL + dir.x * 3, cy = (h.y + 0.5) * CELL + dir.y * 3;
+  ctx.fillRect(cx - ex - 1.5, cy - ey - 1.5, 3, 3);
+  ctx.fillRect(cx + ex - 1.5, cy + ey - 1.5, 3, 3);
+
+  // particles
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.life -= 0.06;
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.fillStyle = "#ff5fa2";
+    ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+  });
+  ctx.globalAlpha = 1;
+  particles = particles.filter(p => p.life > 0);
+}
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.fill();
+}
+
+function gameOver() {
+  running = false;
+  if (score > best) {
+    best = score;
+    bestEl.textContent = best;
+    try { localStorage.setItem("neonSnakeBest", best); } catch {}
+  }
+  overlayTitle.textContent = "Game Over";
+  overlayText.textContent = `You scored ${score}. Best: ${best}.`;
+  startBtn.textContent = "Play again";
+  overlay.classList.remove("hidden");
+}
+
+function togglePause() {
+  if (!running) return;
+  paused = !paused;
+  if (paused) {
+    overlayTitle.textContent = "Paused";
+    overlayText.textContent = "Press Space or Resume to continue.";
+    startBtn.textContent = "Resume";
+    overlay.classList.remove("hidden");
+  } else {
+    overlay.classList.add("hidden");
+    loop();
+  }
+}
+
+// Queue direction changes so quick key presses aren't lost,
+// and block reversing straight into yourself.
+function turn(name) {
+  const map = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+  const d = map[name];
+  if (!d || !running || paused) return;
+  const last = nextDirs.length ? nextDirs[nextDirs.length - 1] : dir;
+  if (d.x === -last.x && d.y === -last.y) return;
+  if (d.x === last.x && d.y === last.y) return;
+  if (nextDirs.length < 3) nextDirs.push(d);
+}
+
+// Keyboard
+document.addEventListener("keydown", e => {
+  const keys = {
+    ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right",
+    w: "up", s: "down", a: "left", d: "right",
+    W: "up", S: "down", A: "left", D: "right",
+  };
+  if (keys[e.key]) { e.preventDefault(); turn(keys[e.key]); }
+  if (e.key === " ") {
+    e.preventDefault();
+    if (!running) start(); else togglePause();
+  }
+});
+
+// Buttons
+startBtn.addEventListener("click", () => (running && paused ? togglePause() : start()));
+document.querySelectorAll(".controls button").forEach(b =>
+  b.addEventListener("click", () => turn(b.dataset.dir))
+);
+
+// Swipe
+let touchStart = null;
+canvas.addEventListener("touchstart", e => {
+  const t = e.touches[0];
+  touchStart = { x: t.clientX, y: t.clientY };
+}, { passive: true });
+canvas.addEventListener("touchend", e => {
+  if (!touchStart) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchStart.x, dy = t.clientY - touchStart.y;
+  if (Math.max(Math.abs(dx), Math.abs(dy)) > 20) {
+    turn(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
+  }
+  touchStart = null;
+});
+
+// Draw the starting board behind the menu
+reset();
+draw();
